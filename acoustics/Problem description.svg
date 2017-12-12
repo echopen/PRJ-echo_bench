@@ -112,9 +112,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="265.19573"
-     inkscape:cy="409.70799"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="226.82035"
+     inkscape:cy="346.53089"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -303,7 +303,7 @@
          sodipodi:role="line"
          x="64.171867"
          y="826.87408"
-         id="tspan4800"> - b: refracted at 45° towards the patient</tspan><tspan
+         id="tspan4800"> - b: reflected at 45° towards the patient</tspan><tspan
          sodipodi:role="line"
          x="64.171867"
          y="851.87408"
@@ -311,7 +311,7 @@
          sodipodi:role="line"
          x="64.171867"
          y="876.87408"
-         id="tspan4802"> - d: refracted by the copper/composite interface</tspan><tspan
+         id="tspan4802"> - d: reflected by the copper/composite interface</tspan><tspan
          sodipodi:role="line"
          x="64.171867"
          y="901.87408"
