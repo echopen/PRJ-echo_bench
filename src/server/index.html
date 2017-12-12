@@ -225,10 +225,10 @@
       function disp_raw(in_msg) {
         var cnv = document.getElementById("cnv_raw");
         var ctx = cnv.getContext("2d");
-        var raw = in_msg["raw"]
+        var raw = in_msg["raw"];
         var scale_x = 1024/raw.length;
         var trans_MHz = parseFloat(disp_freq_mhz.value);
-        var samplings_Msps = current_sampling()
+        var samplings_Msps = current_sampling();
              
         ctx.clearRect(0, 0, cnv.width, cnv.height);
         ctx.strokeStyle="#808080";
@@ -273,6 +273,8 @@
           ctx.lineTo((i+lo_freq_width/2+1)*scale_x, 128-envlp_i);
         }
         ctx.stroke(); 
+        var tension_v = parseFloat(disp_tension_v.value);
+        var gain_db = parseFloat(disp_gain_db.value);
         var t0 = parseFloat(disp_delay_us.value);
         var dt = parseFloat(disp_nb_samples.value)*1/current_sampling();
         var t1 = t0+dt;
@@ -284,7 +286,7 @@
         txt = "<- " + t0.toFixed(1) + "µs (" + x0.toFixed(1) + "mm)";
         ctx.textAlign = "left";      
         ctx.fillText(txt,2,275); 
-        txt = "<- " + dt.toFixed(1) + "µs (" + dx.toFixed(1) + "mm) ->";
+        txt = "<- " + dt.toFixed(1) + "µs (" + dx.toFixed(1) + "mm) " + tension_v + "V " + gain_db + "dB ->";
         ctx.textAlign = "center";      
         ctx.fillText(txt,512,275);
         txt = "" + t1.toFixed(1) + "µs (" + x1.toFixed(1) + "mm) ->";
