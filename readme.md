@@ -1,34 +1,46 @@
-# Project
+Project
+=======
 
 ![](viewme.jpg)
 
-## Name
+Name
+----
 
-[`2017-09-01 PRJ echo_bench`]()
+[2017-09-01 PRJ echo_bench]
 
-## Title
+Title
+-----
 
-Banc de caractérisation automatique de transducteurs à ultrasons.
+Automatic ultrasonic transducers characterisation test bench
 
-## Description
+Description
+-----------
 
-D'après spécifications  [](doc/2017-09-01 SPEC echo_bench_tranducer_measuring_bench fr.pdf)
+This test bench is dedicated to the measurement of ultrasonic transducer
+performances, such as:
 
-## Liste du matériel
+-   experimental identification of the optical focus;
 
-* Carte d'acquisition US-SPI, Lecoeur Electronique, http://www.lecoeur-electronique.net/crbst_16.html
+-   characterisation of the sound field in two dimensions (for example on a 5 x
+    20cm plane);
 
-* Raspberry Pi Zero W, https://www.raspberrypi.org/products/raspberry-pi-zero-w/
+-   influence of diverse parameters on the measurement quality (tension, length
+    of impulse, settings of the analogical acquisition);
 
-* Table XY en kit, XY Plotter Robot Kit, Makeblock, http://store.makeblock.com/xy-plotter-robot-kit
+-   measurement of the variance of technical characteristics between different
+    sensors of a same production batch;
 
-* Pièces adaptatrices en impression 3D (pieds, support transducteur, support cible...)
+-   geometrical validation/correction of an image captured by a complete probe.
 
-## Ressources
-* Documentation US-SPI : [](resources/)
+Technical specifications and part list are available [here](../doc/2017-09-01
+SPEC echo_bench_tranducer_test_bench en.pdf)
 
-## Installation
+Ressources
+----------
 
-### RPi zero W
+TODO
 
-TODO ...
+Installation
+------------
+
+TODO
