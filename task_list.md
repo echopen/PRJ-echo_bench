@@ -12,7 +12,7 @@
 | TSK003   | Todo   | Focus graph               | Add a new type of graph showing  the transducer focus without attenuation due to the depth. | h     | BVi  |
 | TSK004   | Todo   | Redesign table feet       | Current feet are moving and can't  and can not be tightened properly. |       |      |
 | TSK005   | Todo   | Design electronic board   | Design a board to support electronic components (RPi, US-SPI, Arduino) |       |      |
-| TSK006   |        |                           |                                          |       |      |
+| TSK006   | Todo   | Auto-start bench_server   |                                          |       |      |
 | TSK007   |        |                           |                                          |       |      |
 | TSK006   |        |                           |                                          |       |      |
 | TSK006   |        |                           |                                          |       |      |
