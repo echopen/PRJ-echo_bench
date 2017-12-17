@@ -181,6 +181,9 @@ section canvas, section xxxdiv {
   background-color: white;
 }
 
+.params {
+  width:70%;
+}
 .params td.comment {
   vertical-align: middle;
   font-style: italic;

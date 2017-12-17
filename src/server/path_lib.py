@@ -3,6 +3,7 @@
 
 import json
 import time
+import datetime
 import threading
 import os
 import xy_lib
@@ -193,7 +194,9 @@ def run_path_loop(context, ws_send_msg, report_action, dry_run):
             out_msg = {"cmd":"report", "report_from":"path_lib.reset_path()", "report_action":report_action, "data":path_data}
             ws_send_msg(out_msg)
         usspi_lib.set_delay_us(x*1.36+adc_delay) # Update delay for next horizontal point
-      
+
+  if (path_running != "reset" and not(dry_run)): db_write()   # test normaly terminated, save file
+
   out_msg = {"cmd":"report", "report_from":"path_lib.reset_path()", "report_action":report_action, "data":path_data}
   ws_send_msg(out_msg)
   path_running="stopped"
@@ -245,8 +248,8 @@ def get_path_data():
 #----------------------------------------
 def db_list(ws_send_msg, report_action):
 
-  files = os.listdir("db")+["","",""]
-  db = {"path_data_mem1":files[0], "path_data_mem2":files[1], "path_data_mem3":files[2]}
+  files = sorted(os.listdir("db")+["","",""], reverse=True)[:9]
+  db =  {"path_data_mem"+str(i+1):files[i] for i in range(len(files))}
   out_msg = {"cmd":"report", "report_from":"path_lib.db_list()", "report_action":report_action, "data":db}
   ws_send_msg(out_msg)
 
@@ -256,11 +259,21 @@ def db_list(ws_send_msg, report_action):
 def db_reload(item, ws_send_msg, report_action):
   global path_data
 
-  files = os.listdir("db")+["","",""]
-  with open("db/" + files[item]) as json_file:
+  files = files = sorted(os.listdir("db")+["","",""], reverse=True)[:9]
+  with open("db/" + files[item-1]) as json_file:
       path_data = json.load(json_file)
       json_file.close()
 
   out_msg = {"cmd":"report", "report_from":"path_lib.db_reload()", "report_action":report_action, "data":path_data}
   ws_send_msg(out_msg)
 
+#----------------------------------------
+# db_write_file
+#----------------------------------------
+def db_write():
+  global path_data
+
+  date = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M ")
+  with open("db/" + date + path_data["path_params"]["path_title"] + ".json", 'w') as json_file:
+      json.dump(path_data, json_file)
+      json_file.close()

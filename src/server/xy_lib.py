@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 #encoding: UTF-8
 
-import serial
 import re
-
+try: import serial
+except: None
+  
 #########################################
 # Devices interface library
 #########################################

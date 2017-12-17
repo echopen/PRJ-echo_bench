@@ -1,4 +1,5 @@
 var ws;
+var ws_error;
 var working;
 var log;
 
@@ -50,6 +51,7 @@ function fwk_init() {
   
   // Install WebSocket
   ws = new WebSocket("ws://" + location.host + "/ws");
+  ws_error = false;
   
   // Execute when socket opened
   ws.onopen = function () {
@@ -78,6 +80,26 @@ function fwk_init() {
 
   // Execute when error on socket
   ws.onerror = function (error) {
+    ws_error = true;
     log.textContent = 'WebSocket Error ' + error;
   };
+};
+      
+//----------------------------------------
+function fwk_read_file(file, cb) {
+  var xhttp, file_text;
+  if (file) {
+    xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4) {
+        if (this.status == 0) {file_text = this.statusText;}
+        if (this.status == 200) {file_text = this.responseText;}
+        if (this.status == 404) {file_text = "File not found.";}
+        if (cb) cb(file_text);
+      }
+    }      
+    xhttp.open("GET", file, true);
+    xhttp.send();
+    return;
+  }
 };

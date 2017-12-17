@@ -496,7 +496,11 @@
       function reread_path() {
         out_msg = { "cmd":"path_lib.reread_path()"
                   , "report_action":"disp_xy(in_msg)"};
-        ws.send(JSON.stringify(out_msg));
+        if (!ws_error) {
+          ws.send(JSON.stringify(out_msg));
+        } else {
+          disp_xy(local_data);
+        }
       }
       
       //----------------------------------------
@@ -593,15 +597,25 @@
         sec_db.onshow =  function(event) {
           db_list();
           };
-        btn_db_reload_1.onclick = function(event) {
-          db_reload(0);
-          };
-        btn_db_reload_2.onclick = function(event) {
-          db_reload(1);
-          };
-        btn_db_reload_3.onclick = function(event) {
-          db_reload(2);
-          };
+          
+        btn_db_reload_file.onclick = function(event) {
+        function load_local_data_cb(file_text) {
+           eval("local_data['data'] = " + file_text + ";");
+           fwk_show_section(tab_disp);
+           reread_path();
+        }
+          fwk_read_file(disp_path_data_file.value, load_local_data_cb);
+        };
+        
+        btn_db_reload_1.onclick = function(event) { db_reload(1); };
+        btn_db_reload_2.onclick = function(event) { db_reload(2); };
+        btn_db_reload_3.onclick = function(event) { db_reload(3); };
+        btn_db_reload_4.onclick = function(event) { db_reload(4); };
+        btn_db_reload_5.onclick = function(event) { db_reload(5); };
+        btn_db_reload_6.onclick = function(event) { db_reload(6); };
+        btn_db_reload_7.onclick = function(event) { db_reload(7); };
+        btn_db_reload_8.onclick = function(event) { db_reload(8); };
+        btn_db_reload_9.onclick = function(event) { db_reload(9); };
         btn_cnx.onclick = function(event) {
           init_usspi_params();
           init_path_params();
@@ -774,9 +788,16 @@
       <section id="sec_db">
         <h1>Measures database</h1>
         <table class="params">
-          <tr><th>1</th><td><button id="btn_db_reload_1"  type="button" title="Reload memorized measures 1"></button><td><input id="disp_path_data_mem1" type="text" title="memorized measures 1"></input></td></tr>
-          <tr><th>2</th><td><button id="btn_db_reload_2"  type="button" title="Reload memorized measures 2"></button><td><input id="disp_path_data_mem2" type="text" title="memorized measures 2"></input></td></tr>
-          <tr><th>3</th><td><button id="btn_db_reload_3"  type="button" title="Reload memorized measures 3"></button><td><input id="disp_path_data_mem3" type="text" title="memorized measures 3"></input></td></tr>
+          <tr><th></th><td><button id="btn_db_reload_file"  type="button" title="Reload local fie"></button><td><input id="disp_path_data_file" type="text" title="local file" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>1</th><td><button id="btn_db_reload_1"  type="button" title="Reload memorized measures 1"></button><td><input id="disp_path_data_mem1" type="text" title="memorized measures 1" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>2</th><td><button id="btn_db_reload_2"  type="button" title="Reload memorized measures 2"></button><td><input id="disp_path_data_mem2" type="text" title="memorized measures 2" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>3</th><td><button id="btn_db_reload_3"  type="button" title="Reload memorized measures 3"></button><td><input id="disp_path_data_mem3" type="text" title="memorized measures 3" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>4</th><td><button id="btn_db_reload_4"  type="button" title="Reload memorized measures 4"></button><td><input id="disp_path_data_mem4" type="text" title="memorized measures 4" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>5</th><td><button id="btn_db_reload_5"  type="button" title="Reload memorized measures 5"></button><td><input id="disp_path_data_mem5" type="text" title="memorized measures 5" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>6</th><td><button id="btn_db_reload_6"  type="button" title="Reload memorized measures 6"></button><td><input id="disp_path_data_mem6" type="text" title="memorized measures 6" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>7</th><td><button id="btn_db_reload_7"  type="button" title="Reload memorized measures 7"></button><td><input id="disp_path_data_mem7" type="text" title="memorized measures 7" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>8</th><td><button id="btn_db_reload_8"  type="button" title="Reload memorized measures 8"></button><td><input id="disp_path_data_mem8" type="text" title="memorized measures 8" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>9</th><td><button id="btn_db_reload_9"  type="button" title="Reload memorized measures 9"></button><td><input id="disp_path_data_mem9" type="text" title="memorized measures 9" style="width:100%;text-align:left;"></input></td></tr>
         </table>
       </section>
 
