@@ -1,4 +1,3 @@
-% import glob
 <!DOCTYPE html>
 <html>
   <head>
@@ -6,16 +5,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="favicon.png"/>
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css"/>
     <style>
-      % for f in glob.glob('img/*.svg') :
-        % id=f.replace("img/","").replace("img\\","").replace(".svg","")
-        #{{id}} {background-image: url(img/{{id}}.svg);}
-      % end
+        #tab_scan                {background-image: url(img/tab_scan.svg);}
+        #btn_x_m                 {background-image: url(img/btn_x_m.svg);}
+        #btn_reset               {background-image: url(img/btn_reset.svg);}
+        #btn_reread_usspi_params {background-image: url(img/btn_reread_usspi_params.svg);}
+        #btn_pulse_cont          {background-image: url(img/btn_pulse_cont.svg);}
+        #tab_path_params         {background-image: url(img/tab_path_params.svg);}
+        #btn_pom                 {background-image: url(img/btn_pom.svg);}
+        #tab_db                  {background-image: url(img/tab_db.svg);}
+        #btn_x_p                 {background-image: url(img/btn_x_p.svg);}
+        #btn_y_m                 {background-image: url(img/btn_y_m.svg);}
+        #tab_usspi_params        {background-image: url(img/tab_usspi_params.svg);}
+        #btn_reread_path_params  {background-image: url(img/btn_reread_path_params.svg);}
+        #btn_run                 {background-image: url(img/btn_run.svg);}
+        #tab_acq                 {background-image: url(img/tab_acq.svg);}
+        #btn_pause               {background-image: url(img/btn_pause.svg);}
+        #btn_run                 {background-image: url(img/btn_run.svg);}
+        #btn_y_p                 {background-image: url(img/btn_y_p.svg);}
+        #btn_apply_usspi_params  {background-image: url(img/btn_apply_usspi_params.svg);}
+        #btn_send_g              {background-image: url(img/btn_send_g.svg);}
+        #btn_set_org             {background-image: url(img/btn_set_org.svg);}
+        #tab_home                {background-image: url(img/tab_home.svg);}
+        #btn_apply_path_params   {background-image: url(img/btn_apply_path_params.svg);}
+        #btn_cnx                 {background-image: url(img/btn_cnx.svg);}
+        #btn_delay_m             {background-image: url(img/btn_delay_m.svg);}
+        #tab_emit                {background-image: url(img/tab_emit.svg);}
+        #btn_delay_p             {background-image: url(img/btn_delay_p.svg);}
+        #btn_pulse_one           {background-image: url(img/btn_pulse_one.svg);}
+        #btn_xy_0                {background-image: url(img/btn_xy_0.svg);}
+        #xxxbtn_xy_0             {background-image: url(img/xxxbtn_xy_0.svg);}
+        #tab_disp                {background-image: url(img/tab_disp.svg);}
+        #btn_pulse_stop          {background-image: url(img/btn_pulse_stop.svg);}
+        #btn_db_reload_1,#btn_db_reload_2,#btn_db_reload_3,#btn_db_reload_4,
+        #btn_db_reload_5,#btn_db_reload_6,#btn_db_reload_7,#btn_db_reload_8,
+        #btn_db_reload_9        {background-image: url(img/btn_db_reload.svg);}
     </style>
     <script src="plotly-latest.min.js"></script>
     <script src="framework.js"></script> 
     <script type="text/javascript">
+      var local_data=[];
+      
       //----------------------------------------
       function current_sampling() {
         return {"0":160,"1":80, "2":40}[disp_sampling_freq.value] * {"0":1,"1":0.5, "2":0.25}[disp_compression_factor.value];
@@ -28,7 +59,7 @@
       
       //----------------------------------------
       function disp_g_console(in_msg) {
-        data = in_msg["data"]
+        data = in_msg["data"];
         txt_g_console.textContent += in_msg["text"];
         if (in_msg["x"] > "" && in_msg["y"] > "")
         {
@@ -42,12 +73,13 @@
       function disp_xy(in_msg) {
         data = in_msg["data"];
         if (data===null) return;
-        var db_mode = rdo_graph_db_c.checked||rdo_graph_db_s.checked;
-        var surf_mode = rdo_graph_db_s.checked||rdo_graph_a_s.checked;
+        var db_mode = rdo_graph_db_c.checked||rdo_graph_db_s.checked||rdo_graph_dbc_c.checked;
+	var compensate_mode = rdo_graph_dbc_c.checked;
+        var surf_mode = rdo_graph_db_s.checked;
         
-        var m = data["measures"]
-        var x_set = [...new Set(m.map(item => item[1]))].sort(function(a, b){return a-b});
-        var y_set = [...new Set(m.map(item => item[2]))].sort(function(a, b){return a-b});
+        var m = data["measures"];
+        var x_set = [...new Set(m.map(item => item[1]))].sort(function(a, b){return a-b;});
+        var y_set = [...new Set(m.map(item => item[2]))].sort(function(a, b){return a-b;});
 
         var z= new Array(y_set.length);
         for(var iy = 0; iy < y_set.length; iy++)
@@ -55,7 +87,7 @@
           z[iy] = new Array(x_set.length);
           }
 
-        var vmax = m.reduce(function(max, itm){ return itm[3] > max ? itm[3] : max },-1);
+        var vmax = m.reduce(function(max, itm){ return itm[3] > max ? itm[3] : max; },-1);
         for(i=0;i<m.length;i++)
           {
           var x = m[i][1];
@@ -64,7 +96,19 @@
           var dB = 20*Math.log10((v+0.001)/vmax);
           z[y_set.indexOf(y)][x_set.indexOf(x)] = db_mode ? dB : v ;
           }
-          
+
+        if(compensate_mode) {
+              for(ix=0; ix < z[0].length; ix++){
+                dbmax_x = -999999999;
+                    for(iy=0; iy<z.length; iy++){
+                      if(z[iy][ix] > dbmax_x) dbmax_x = z[iy][ix];
+                    }
+                    for(iy=0; iy<z.length; iy++){
+                      z[iy][ix] += -dbmax_x;
+                    }
+              }
+            }
+		
         var plot_data = [ {
                 x: x_set,
                 y: y_set,
@@ -109,7 +153,7 @@
              size: 12
             }
           , margin: {l:40, r:40, t:40, b:40, pad:0, autoexpand:true}
-        }
+          };
 
         Plotly.newPlot('div_plotxy', plot_data, plot_layout);
 
@@ -249,7 +293,7 @@
         ctx.stroke();
         
         var raw_abs=[];
-        for(i=0;i<raw.length;i++){raw_abs[i] = Math.abs(raw[i]-128)}
+        for(i=0;i<raw.length;i++){raw_abs[i] = Math.abs(raw[i]-128);}
         
         ctx.strokeStyle="#00FF00";
         ctx.beginPath();
@@ -264,7 +308,7 @@
         ctx.moveTo(0, 128);
         lo_freq_width = Math.max(1, Math.trunc(samplings_Msps/(trans_MHz  *2)) + 1);
         hi_freq_width = Math.max(1, Math.trunc(samplings_Msps/(trans_MHz*4*2)) + 1);
-        filtered = []
+        filtered = [];
         for (i=0; i<raw_abs.length-hi_freq_width; i++)
         { filtered[i] = Math.min(...raw_abs.slice(i, i+hi_freq_width));
         }
@@ -506,7 +550,7 @@
           send_g( inp_g.value );
           };
         inp_g.onkeypress = function(event) {
-          if (event.keyCode == 13) {
+          if (event.keyCode === 13) {
             send_g( inp_g.value );
             }
           };
@@ -520,7 +564,7 @@
           apply_usspi_params();
           };
         sec_usspi_params.onkeypress = function(event) {
-          if (event.keyCode == 13) {
+          if (event.keyCode === 13) {
             fwk_show_section(tab_disp);
             }
           };
@@ -535,7 +579,7 @@
           apply_path_params();
           };
         sec_path_params.onkeypress = function(event) {
-          if (event.keyCode == 13) {
+          if (event.keyCode === 13) {
             fwk_show_section(tab_disp);
             }
           };
@@ -584,18 +628,18 @@
         rdo_graph_db_s.onclick = function(event) {
           reread_path();
           };
-        rdo_graph_a_s.onclick = function(event) {
+        rdo_graph_dbc_c.onclick = function(event) {
           reread_path();
           };
         btn_delay_p.onclick = function(event) {
           d = Math.min(500, (parseFloat(disp_delay_us.value) + parseFloat(disp_nb_samples.value)*1/current_sampling()/3).toFixed(0));
           init_usspi_delay_param(d);
-          read_raw(-1)
+          read_raw(-1);
           };
         btn_delay_m.onclick = function(event) {
           d = Math.max(0, (parseFloat(disp_delay_us.value) - parseFloat(disp_nb_samples.value)*1/current_sampling()/3).toFixed(0));
           init_usspi_delay_param(d);
-          read_raw(-1)
+          read_raw(-1);
           };
       }
       
@@ -629,8 +673,8 @@
             <td colspan="3">
               <input id="rdo_graph_db_c" type="radio" name="set_graph_mode" value="db" title="Attenuation contour" checked="true">dB</input>
               <input id="rdo_graph_a_c" type="radio" name="set_graph_mode" value="v" title="Amplitude contour" >A</input>
-              <input id="rdo_graph_db_s" type="radio" name="set_graph_mode" value="db" title="Attenuation surface">dBs</input>
-              <input id="rdo_graph_a_s" type="radio" name="set_graph_mode" value="v" title="Amplitude surface" >As</input>
+              <input id="rdo_graph_db_s" type="radio" name="set_graph_mode" value="dbs" title="Attenuation surface">dBs</input>
+              <input id="rdo_graph_dbc_c" type="radio" name="set_graph_mode" value="dbc" title="Attenuation compensée contour" >dBc</input>
             </td>
           </tr>  
           <tr>
