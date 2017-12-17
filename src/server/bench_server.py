@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #encoding: UTF-8
 
+import os
 import json
 import bottle
 from bottle import route, run, request, abort, Bottle ,static_file, template
@@ -12,10 +13,11 @@ from time import sleep
 import random
 import threading
 import base64
+
 import xy_lib
 import usspi_lib
 import path_lib
-
+  
 #########################################
 # HTTP and Websocket server
 #########################################
@@ -162,6 +164,9 @@ def send_static(filename):
   return static_file(filename, root='.')
 
 #========================================
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
 host = "0.0.0.0"
 port = 80
 context["xy_com"] = xy_lib.open_com("/dev/ttyAMA0") # For Raspberry Pi zero X, "COMxx" on Windows PC
