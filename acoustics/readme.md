@@ -4,7 +4,7 @@ Acoustics of mirrored waves
 Problem description
 -------------------
 
-[./Problem_description.png](./Problem_description.png)
+![./Problem_description.png](./Problem_description.png)
 
 -   Problem 1: define the angles of all reflected and transmitted longitudinal
     (black vectors) and shear (red vectors) waves.
