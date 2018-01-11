@@ -113,9 +113,9 @@ Shear velocity (speed of shear wave propagation, in m/s):
 
 -   In composite:
 
-    -   unknown
+    -   No data found. As default value we take compression velocity / sqrt(2)
 
--   I water and air: no shear wave propagation
+-   In water and air: no shear wave propagation
 
 Acoustic impedence (in Ns/m³):
 
