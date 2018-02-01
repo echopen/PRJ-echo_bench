@@ -22,6 +22,7 @@ import path_lib
 # HTTP and Websocket server
 #########################################
 wsock = None
+wsock_inuse = False
 context = {"xy_com":None}
 app = Bottle()
 
@@ -30,13 +31,29 @@ app = Bottle()
 #----------------------------------------
 def ws_send_msg(msg):
   global wsock
-  
+  global wsock_inuse
+
   if msg :
     msg_json = json.dumps(msg, separators=(',',':'))
     # print(msg_json[:256]) # DEBUG
-    wsock.send(msg_json)
-    return True
+    i=0
+    while wsock_inuse:
+      sleep(0.1)
+      i += 1
+      if i > 30 : return False
     
+    wsock_inuse = True
+    try:
+      wsock.send(msg_json)
+    except WebSocketError:
+      wsock_inuse = False
+      return False
+    
+    wsock_inuse = False
+    return True
+  
+  else:
+    return True
 #----------------------------------------
 # Asynchronous report function
 #----------------------------------------
@@ -53,6 +70,7 @@ def handle_websocket():
   global wsock
   
   wsock = request.environ.get('wsgi.websocket')
+  wsock_inuse = False
   if not wsock:
     abort(400, 'Expected WebSocket request.')
   while True:
@@ -121,7 +139,8 @@ def handle_websocket():
       else:
         print("Not understood !")        
 
-      ws_send_msg(out_msg)
+      if not ws_send_msg(out_msg) : break
+      
         
     except WebSocketError:
       break

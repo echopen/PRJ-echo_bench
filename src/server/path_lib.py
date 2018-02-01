@@ -182,7 +182,7 @@ def run_path_loop(context, ws_send_msg, report_action, dry_run):
             usspi_lib.set_delay_us(x*1.36+adc_delay) 
             # Report vertical line
             out_msg = {"cmd":"report", "report_from":"path_lib.reset_path()", "report_action":report_action, "data":path_data}
-            ws_send_msg(out_msg)
+            if not ws_send_msg(out_msg) : break
       else:  # scan horizontally
         x += stepx
         if x < xmin or x > xmax:
@@ -192,7 +192,7 @@ def run_path_loop(context, ws_send_msg, report_action, dry_run):
           if not(dry_run):
             # Report vertical line
             out_msg = {"cmd":"report", "report_from":"path_lib.reset_path()", "report_action":report_action, "data":path_data}
-            ws_send_msg(out_msg)
+            if not ws_send_msg(out_msg) : break
         usspi_lib.set_delay_us(x*1.36+adc_delay) # Update delay for next horizontal point
 
   if (path_running != "reset" and not(dry_run)): db_write()   # test normaly terminated, save file

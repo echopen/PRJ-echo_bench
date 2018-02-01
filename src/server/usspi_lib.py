@@ -368,8 +368,7 @@ def read_raw_loop(ws_send_msg, report_action):
     time.sleep(0.01)
     resp = get_samples()
     out_msg = {"cmd":"report", "report_from":"usspi_lib.read_raw()", "report_action":report_action, "raw":resp}
-    ws_send_msg(out_msg)
-    if read_period > 0 :
+    if ws_send_msg(out_msg) and read_period > 0 :
       time.sleep(read_period)
     else:
       break
