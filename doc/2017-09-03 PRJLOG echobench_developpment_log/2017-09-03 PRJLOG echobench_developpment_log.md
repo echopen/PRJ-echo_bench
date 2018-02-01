@@ -374,6 +374,16 @@ Le résultat obtenu est meilleur et comparable à la mesure sans miroir à tensi
 
 ![2017-11-24_archet2](2017-11-24_archet2.jpg)
 
+## 2018-01-31 Connexion console par Bluetooth
+
+D'après https://hacks.mozilla.org/2017/02/headless-raspberry-pi-configuration-over-bluetooth/
+et https://github.com/DrRowland/RPi-Bluetooth-Console/blob/master/setup.sh
+
+```
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install bluetooth bluez blueman
+```
 
 
 ----
