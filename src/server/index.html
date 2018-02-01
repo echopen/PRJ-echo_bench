@@ -6,47 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="favicon.png"/>
     <link rel="stylesheet" type="text/css" href="style.css"/>
-    <style>
-        #tab_scan                {background-image: url(img/tab_scan.svg);}
-        #btn_x_m                 {background-image: url(img/btn_x_m.svg);}
-        #btn_reset               {background-image: url(img/btn_reset.svg);}
-        #btn_reread_usspi_params {background-image: url(img/btn_reread_usspi_params.svg);}
-        #btn_pulse_cont          {background-image: url(img/btn_pulse_cont.svg);}
-        #tab_path_params         {background-image: url(img/tab_path_params.svg);}
-        #btn_pom                 {background-image: url(img/btn_pom.svg);}
-        #tab_db                  {background-image: url(img/tab_db.svg);}
-        #btn_x_p                 {background-image: url(img/btn_x_p.svg);}
-        #btn_y_m                 {background-image: url(img/btn_y_m.svg);}
-        #tab_usspi_params        {background-image: url(img/tab_usspi_params.svg);}
-        #btn_reread_path_params  {background-image: url(img/btn_reread_path_params.svg);}
-        #btn_run                 {background-image: url(img/btn_run.svg);}
-        #tab_acq                 {background-image: url(img/tab_acq.svg);}
-        #btn_pause               {background-image: url(img/btn_pause.svg);}
-        #btn_run                 {background-image: url(img/btn_run.svg);}
-        #btn_y_p                 {background-image: url(img/btn_y_p.svg);}
-        #btn_apply_usspi_params  {background-image: url(img/btn_apply_usspi_params.svg);}
-        #btn_send_g              {background-image: url(img/btn_send_g.svg);}
-        #btn_set_org             {background-image: url(img/btn_set_org.svg);}
-        #tab_home                {background-image: url(img/tab_home.svg);}
-        #btn_apply_path_params   {background-image: url(img/btn_apply_path_params.svg);}
-        #btn_cnx                 {background-image: url(img/btn_cnx.svg);}
-        #btn_delay_m             {background-image: url(img/btn_delay_m.svg);}
-        #tab_emit                {background-image: url(img/tab_emit.svg);}
-        #btn_delay_p             {background-image: url(img/btn_delay_p.svg);}
-        #btn_pulse_one           {background-image: url(img/btn_pulse_one.svg);}
-        #btn_xy_0                {background-image: url(img/btn_xy_0.svg);}
-        #xxxbtn_xy_0             {background-image: url(img/xxxbtn_xy_0.svg);}
-        #tab_disp                {background-image: url(img/tab_disp.svg);}
-        #btn_pulse_stop          {background-image: url(img/btn_pulse_stop.svg);}
-        #btn_db_reload_1,#btn_db_reload_2,#btn_db_reload_3,#btn_db_reload_4,
-        #btn_db_reload_5,#btn_db_reload_6,#btn_db_reload_7,#btn_db_reload_8,
-        #btn_db_reload_9        {background-image: url(img/btn_db_reload.svg);}
-    </style>
     <script src="plotly-latest.min.js"></script>
     <script src="framework.js"></script> 
     <script type="text/javascript">
-      var local_data=[];
-      
+
+      let local_data=[];
+      let cur_period=0;
+              
       //----------------------------------------
       function current_sampling() {
         return {"0":160,"1":80, "2":40}[disp_sampling_freq.value] * {"0":1,"1":0.5, "2":0.25}[disp_compression_factor.value];
@@ -59,7 +25,7 @@
       
       //----------------------------------------
       function disp_g_console(in_msg) {
-        data = in_msg["data"];
+        const data = in_msg["data"];
         txt_g_console.textContent += in_msg["text"];
         if (in_msg["x"] > "" && in_msg["y"] > "")
         {
@@ -70,46 +36,50 @@
       }
       
       //----------------------------------------
+      function disp_clear_xy() {
+        Plotly.purge('div_plotxy');
+      }
+      //----------------------------------------
       function disp_xy(in_msg) {
         data = in_msg["data"];
         if (data===null) return;
-        var db_mode = rdo_graph_db_c.checked||rdo_graph_db_s.checked||rdo_graph_dbc_c.checked;
-	var compensate_mode = rdo_graph_dbc_c.checked;
-        var surf_mode = rdo_graph_db_s.checked;
+        const db_mode = rdo_graph_db_c.checked||rdo_graph_db_s.checked||rdo_graph_dbc_c.checked;
+	const compensate_mode = rdo_graph_dbc_c.checked;
+        const surf_mode = rdo_graph_db_s.checked;
         
-        var m = data["measures"];
-        var x_set = [...new Set(m.map(item => item[1]))].sort(function(a, b){return a-b;});
-        var y_set = [...new Set(m.map(item => item[2]))].sort(function(a, b){return a-b;});
+        const m = data["measures"];
+        const x_set = [...new Set(m.map(item => item[1]))].sort(function(a, b){return a-b;});
+        const y_set = [...new Set(m.map(item => item[2]))].sort(function(a, b){return a-b;});
 
-        var z= new Array(y_set.length);
-        for(var iy = 0; iy < y_set.length; iy++)
+        let z= new Array(y_set.length);
+        for(let iy = 0; iy < y_set.length; iy++)
           {
           z[iy] = new Array(x_set.length);
           }
 
-        var vmax = m.reduce(function(max, itm){ return itm[3] > max ? itm[3] : max; },-1);
-        for(i=0;i<m.length;i++)
+        const vmax = m.reduce(function(max, itm){ return itm[3] > max ? itm[3] : max; },-1);
+        for(let i=0;i<m.length;i++)
           {
-          var x = m[i][1];
-          var y = m[i][2];
-          var v = m[i][3];
-          var dB = 20*Math.log10((v+0.001)/vmax);
+          const x = m[i][1];
+          const y = m[i][2];
+          const v = m[i][3];
+          const dB = 20*Math.log10((v+0.001)/vmax);
           z[y_set.indexOf(y)][x_set.indexOf(x)] = db_mode ? dB : v ;
           }
 
         if(compensate_mode) {
-              for(ix=0; ix < z[0].length; ix++){
-                dbmax_x = -999999999;
-                    for(iy=0; iy<z.length; iy++){
+              for(let ix=0; ix < z[0].length; ix++){
+                let dbmax_x = -999999999;
+                    for(let iy=0; iy<z.length; iy++){
                       if(z[iy][ix] > dbmax_x) dbmax_x = z[iy][ix];
                     }
-                    for(iy=0; iy<z.length; iy++){
+                    for(let iy=0; iy<z.length; iy++){
                       z[iy][ix] += -dbmax_x;
                     }
               }
             }
 		
-        var plot_data = [ {
+        const plot_data = [ {
                 x: x_set,
                 y: y_set,
                 z: z,
@@ -125,18 +95,18 @@
             }
         ];
 
-        var path_title = data["path_params"]["path_title"];
-        var x_step = parseFloat(data["path_params"]["path_x_step"]);
-        var y_step = parseFloat(data["path_params"]["path_y_step"]);
-        var path_length = parseFloat(data["path_params"]["path_length"]);
-        var path_width = parseFloat(data["path_params"]["path_width"]);
-        var path_speed = parseFloat(data["path_params"]["path_speed"]);
-        var path_scan_mode = parseFloat(data["path_params"]["path_scan_mode"]);
-        var path_adc_delay = parseFloat(data["path_params"]["path_adc_delay"]);
-        var tension_v = parseFloat(data["us_spi_params"]["tension_v"]);
-        var freq_mhz = parseFloat(data["us_spi_params"]["freq_mhz"]);
-        var gain_db = parseFloat(data["us_spi_params"]["gain_db"]);
-        var comment = "" + path_title + 
+        const path_title = data["path_params"]["path_title"];
+        const x_step = parseFloat(data["path_params"]["path_x_step"]);
+        const y_step = parseFloat(data["path_params"]["path_y_step"]);
+        const path_length = parseFloat(data["path_params"]["path_length"]);
+        const path_width = parseFloat(data["path_params"]["path_width"]);
+        const path_speed = parseFloat(data["path_params"]["path_speed"]);
+        const path_scan_mode = parseFloat(data["path_params"]["path_scan_mode"]);
+        const path_adc_delay = parseFloat(data["path_params"]["path_adc_delay"]);
+        const tension_v = parseFloat(data["us_spi_params"]["tension_v"]);
+        const freq_mhz = parseFloat(data["us_spi_params"]["freq_mhz"]);
+        const gain_db = parseFloat(data["us_spi_params"]["gain_db"]);
+        const comment = "" + path_title + 
                       ", " + (db_mode ? "Attenuation" : "Amplitude") +
                       ", " + path_length + "mm x " + path_width + "mm" +
                       ", Step: " + x_step + "mm x " + y_step + "mm" +
@@ -147,7 +117,7 @@
                       ", " + freq_mhz + "MHz" +
                       ", " + gain_db + "dB";
 
-        var plot_layout = {
+        const plot_layout = {
             title: comment
           , titlefont: {
              size: 12
@@ -159,107 +129,10 @@
 
       }
       
-//      //----------------------------------------
-//      function disp_xy_old(in_msg) {
-//        data = in_msg["data"];
-//        if (data===null) return;
-//        
-//        var dB=0;
-//        var cnv = document.getElementById("cnv_xy");
-//        var ctx = cnv.getContext("2d");
-//        var path_length = parseFloat(data["path_params"]["path_length"]);
-//        var path_width = parseFloat(data["path_params"]["path_width"]);
-//        var scale_x = cnv.width/path_length;
-//        var scale_y = -cnv.height/path_width;
-//        if ((rdo_graph_db.checked))
-//        {
-//          var scale_xy = Math.min( scale_x, -scale_y );
-//          scale_x = scale_xy;
-//          scale_y = -scale_xy;          
-//        }
-//        var offset_x = 0;
-//        var offset_y = cnv.height/2;
-//        ctx.clearRect(0, 0, cnv.width, cnv.height);
-//        if (data["measures"])
-//        {
-//          var m = data["measures"];
-//
-//          // Draw values
-//          var x_step = parseFloat(data["path_params"]["path_x_step"]);
-//          var y_step = parseFloat(data["path_params"]["path_y_step"]);
-//          for(i=0;i<m.length;i++)
-//          {
-//            x = m[i][1];
-//            y = m[i][2];
-//            v = m[i][3];
-//            if (v >= 0)
-//            { // Measured values
-//              dB = 20*Math.log10((v+1)/256)
-//              //h = 256-(v%128)*2; // < 128 -> < -6dB, > 128 -> > -6dB
-//              h = -dB/50*256;
-//              l = 50 + h/256*45;
-//              s = "100%"
-//              if (v>=255) {l=0;}  // saturation or -6dB
-//              if (dB < -6) {l=60;} else {l=50;}  // saturation or -6dB
-//              ctx.fillStyle="hsl("+ h +", " + s + ", "+ l +"%)";
-//              ctx.fillRect(Math.floor((x-x_step/2)*scale_x)+offset_x, Math.floor((y-y_step/2)*scale_y)+offset_y, Math.floor(x_step*scale_x)+1, Math.floor(y_step*scale_y));
-//            }
-//            else
-//            { // Dry values
-//              ctx.fillStyle="#e0e0e0";
-//              ctx.fillRect((x-x_step/2)*scale_x+offset_x-2, (y-y_step/2)*scale_y+offset_y-2, x_step*scale_x, y_step*scale_y);
-//            }
-//          }
-//                    
-//          // Draw grid
-//          ctx.beginPath();              
-//          ctx.strokeStyle="#b0b0b0";
-//          ctx.lineWidth=1;
-//          grd_step=5;
-//          for( x=0; x <= cnv.width/scale_x; x+=grd_step)
-//          {
-//            ctx.moveTo(x*scale_x+offset_x, 0);
-//            ctx.lineTo(x*scale_x+offset_x, cnv.height);
-//          }
-//          for( y=grd_step; y <= cnv.height/2/-scale_y; y+=grd_step)
-//          {
-//            ctx.moveTo(0,         y*scale_y+offset_y);
-//            ctx.lineTo(cnv.width, y*scale_y+offset_y);
-//          }
-//          for( y=-grd_step; y >= -cnv.height/2/-scale_y; y-=grd_step)
-//          {
-//            ctx.moveTo(0,         y*scale_y+offset_y);
-//            ctx.lineTo(cnv.width, y*scale_y+offset_y);
-//          }
-//          ctx.stroke();
-//          ctx.beginPath();              
-//          ctx.strokeStyle="#000000";
-//          ctx.moveTo(0,         0*scale_y+offset_y);
-//          ctx.lineTo(cnv.width, 0*scale_y+offset_y);
-//          ctx.stroke();
-//          
-//          ctx.font = "14px Arial";
-//          ctx.fillStyle="#000000";
-//          var comment = "Test : " + disp_path_title.value + 
-//                        " - Size : " + path_length + "mm x " + path_width + "mm" +
-//                        " - Step : " + x_step + "mm x " + y_step + "mm" +
-//                        " - Speed : " + disp_path_speed.value + "mm/min" +
-//                        " - Scan mode : " + disp_path_scan_mode.value +
-//                        " - Delay : " + disp_path_adc_delay.value + "µs";
-//                
-//          ctx.fillText(comment,2,14); 
-//          comment = "Tension : " + disp_tension_v.value + "V" +
-//                    " - Freq : " + disp_freq_mhz.value + "MHz" +
-//                    " - Gain : " + disp_gain_db.value + "dB";
-//          ctx.fillText(comment,2,cnv.height-4); 
-//        }
-//
-//      }
-      
       //----------------------------------------
       function disp_params(in_msg) {
-        data = in_msg["data"];
-        for (n in data){
+        const data = in_msg["data"];
+        for (let n in data){
           try { document.getElementById("disp_" + n).value = data[n]; }
           catch (e){}
         }
@@ -267,12 +140,12 @@
       
       //----------------------------------------
       function disp_raw(in_msg) {
-        var cnv = document.getElementById("cnv_raw");
-        var ctx = cnv.getContext("2d");
-        var raw = in_msg["raw"];
-        var scale_x = 1024/raw.length;
-        var trans_MHz = parseFloat(disp_freq_mhz.value);
-        var samplings_Msps = current_sampling();
+        const cnv = document.getElementById("cnv_raw");
+        const ctx = cnv.getContext("2d");
+        const raw = in_msg["raw"];
+        const scale_x = 1024/raw.length;
+        const trans_MHz = parseFloat(disp_freq_mhz.value);
+        const samplings_Msps = current_sampling();
              
         ctx.clearRect(0, 0, cnv.width, cnv.height);
         ctx.strokeStyle="#808080";
@@ -287,18 +160,18 @@
         ctx.strokeStyle="#000000";
         ctx.beginPath();              
         ctx.moveTo(0, 128);
-        for(i=0;i<raw.length;i++)
+        for(let i=0;i<raw.length;i++)
         { ctx.lineTo(i*scale_x, 256-raw[i]);
         }
         ctx.stroke();
         
-        var raw_abs=[];
-        for(i=0;i<raw.length;i++){raw_abs[i] = Math.abs(raw[i]-128);}
+        let raw_abs=[];
+        for(let i=0;i<raw.length;i++){raw_abs[i] = Math.abs(raw[i]-128);}
         
         ctx.strokeStyle="#00FF00";
         ctx.beginPath();
         ctx.moveTo(0, 128);
-        for(i=0;i<raw.length;i++)
+        for(let i=0;i<raw.length;i++)
         { ctx.lineTo(i*scale_x, 128-raw_abs[i]);
         }
         ctx.stroke(); 
@@ -306,25 +179,25 @@
         ctx.strokeStyle="#FF0000";
         ctx.beginPath();
         ctx.moveTo(0, 128);
-        lo_freq_width = Math.max(1, Math.trunc(samplings_Msps/(trans_MHz  *2)) + 1);
-        hi_freq_width = Math.max(1, Math.trunc(samplings_Msps/(trans_MHz*4*2)) + 1);
-        filtered = [];
-        for (i=0; i<raw_abs.length-hi_freq_width; i++)
+        const lo_freq_width = Math.max(1, Math.trunc(samplings_Msps/(trans_MHz  *2)) + 1);
+        const hi_freq_width = Math.max(1, Math.trunc(samplings_Msps/(trans_MHz*4*2)) + 1);
+        let filtered = [];
+        for (let i=0; i<raw_abs.length-hi_freq_width; i++)
         { filtered[i] = Math.min(...raw_abs.slice(i, i+hi_freq_width));
         }
-        for(i=0;i<filtered.length-lo_freq_width;i++)
+        for(let i=0;i<filtered.length-lo_freq_width;i++)
         { envlp_i = Math.max(...filtered.slice(i, i+lo_freq_width));
           ctx.lineTo((i+lo_freq_width/2+1)*scale_x, 128-envlp_i);
         }
         ctx.stroke(); 
-        var tension_v = parseFloat(disp_tension_v.value);
-        var gain_db = parseFloat(disp_gain_db.value);
-        var t0 = parseFloat(disp_delay_us.value);
-        var dt = parseFloat(disp_nb_samples.value)*1/current_sampling();
-        var t1 = t0+dt;
-        var x0 = t0 / 1.36;         
-        var dx = dt / 1.36; 
-        var x1 = x0+dx;
+        const tension_v = parseFloat(disp_tension_v.value);
+        const gain_db = parseFloat(disp_gain_db.value);
+        const t0 = parseFloat(disp_delay_us.value);
+        const dt = parseFloat(disp_nb_samples.value)*1/current_sampling();
+        const t1 = t0+dt;
+        const x0 = t0 / 1.36;         
+        const dx = dt / 1.36; 
+        const x1 = x0+dx;
         ctx.font = "16px Arial";
         ctx.fillStyle="#000000";
         txt = "<- " + t0.toFixed(1) + "µs (" + x0.toFixed(1) + "mm)";
@@ -341,10 +214,10 @@
       //----------------------------------------
       function send_g(lines) {
         txt_g_console.textContent = "";
-        out_msg = { "msg_type":"eval"
-                  , "expression":"xy_lib.send_g_lines(...)"
-                  , "lines":lines
-                  };
+        const out_msg = { "msg_type":"eval"
+                        , "expression":"xy_lib.send_g_lines(...)"
+                        , "lines":lines
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
@@ -352,150 +225,157 @@
       function read_raw(period) {
         if (period < 0){ period = cur_period; }
         cur_period = period;
-        out_msg = { "cmd":"usspi_lib.read_raw()"
-                     , "period":period
-                     , "report_action":"disp_raw(in_msg)"};
+        const out_msg = { "cmd":"usspi_lib.read_raw()"
+                        , "period":period
+                        , "report_action":"disp_raw(in_msg)"};
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function init_usspi_params() {
-        out_msg = { "cmd":"usspi_lib.init_params()"
-                  , "new_params":{ "gain_db": "15"
-                                 , "delay_us": "0"
-                                 , "sampling_freq": "2"
-                                 , "compression_factor": "2"
-                                 , "tension_v": "50"         
-                                 , "freq_mhz": "3.5"          
-                                 , "prf_hz": "100"           
-                                 , "filter_no": "4"         
-                                 , "nb_samples": "1024"         
-                                 }
-                  , "report_action":"disp_params(in_msg)"
-                  };
+        const out_msg = { "cmd":"usspi_lib.init_params()"
+                        , "new_params":{ "gain_db": "15"
+                                       , "delay_us": "0"
+                                       , "sampling_freq": "2"
+                                       , "compression_factor": "2"
+                                       , "tension_v": "50"         
+                                       , "freq_mhz": "3.5"          
+                                       , "prf_hz": "100"           
+                                       , "filter_no": "4"         
+                                       , "nb_samples": "1024"         
+                                       }
+                        , "report_action":"disp_params(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function init_usspi_delay_param(d) {
-        out_msg = { "cmd":"usspi_lib.init_params()"
-                  , "new_params":{ "delay_us": String(d) }
-                  , "report_action":"disp_params(in_msg)"
-                  };
+        const out_msg = { "cmd":"usspi_lib.init_params()"
+                        , "new_params":{ "delay_us": String(d) }
+                        , "report_action":"disp_params(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function init_path_params() {
-        out_msg = { "cmd":"path_lib.init_params()"
-                  , "new_params":{ "path_title": "No name"
-                                 , "path_width": "15"
-                                 , "path_length": "250"
-                                 , "path_x_step": "1"
-                                 , "path_y_step": "0.2"
-                                 , "path_speed": "10000"
-                                 , "path_scan_mode": "1"
-                                 , "path_adc_delay": "5"
-                                 }
-                  , "report_action":"disp_params(in_msg)"
-                  };
+        const out_msg = { "cmd":"path_lib.init_params()"
+                        , "new_params":{ "path_title": "No name"
+                                       , "path_width": "15"
+                                       , "path_length": "250"
+                                       , "path_x_step": "1"
+                                       , "path_y_step": "0.2"
+                                       , "path_speed": "10000"
+                                       , "path_scan_mode": "1"
+                                       , "path_adc_delay": "5"
+                                       }
+                        , "report_action":"disp_params(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function apply_usspi_params() {
-        out_msg = { "cmd":"usspi_lib.init_params()"
-                  , "new_params":{ "gain_db": disp_gain_db.value
-                                 , "delay_us": disp_delay_us.value
-                                 , "sampling_freq": disp_sampling_freq.value
-                                 , "compression_factor": disp_compression_factor.value
-                                 , "tension_v": disp_tension_v.value         
-                                 , "freq_mhz": disp_freq_mhz.value          
-                                 , "prf_hz": disp_prf_hz.value            
-                                 , "filter_no": disp_filter_no.value         
-                                 , "nb_samples": disp_nb_samples.value         
-                                 }
-                  , "report_action":"disp_params(in_msg)"
-                  };
+        const out_msg = { "cmd":"usspi_lib.init_params()"
+                        , "new_params":{ "gain_db": disp_gain_db.value
+                                       , "delay_us": disp_delay_us.value
+                                       , "sampling_freq": disp_sampling_freq.value
+                                       , "compression_factor": disp_compression_factor.value
+                                       , "tension_v": disp_tension_v.value         
+                                       , "freq_mhz": disp_freq_mhz.value          
+                                       , "prf_hz": disp_prf_hz.value            
+                                       , "filter_no": disp_filter_no.value         
+                                       , "nb_samples": disp_nb_samples.value         
+                                       }
+                        , "report_action":"disp_params(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function apply_path_params() {
-        out_msg = { "cmd":"path_lib.init_params()"
-                  , "new_params":{ "path_title":     disp_path_title.value
-                                 , "path_width":     disp_path_width.value
-                                 , "path_length":    disp_path_length.value
-                                 , "path_x_step":    disp_path_x_step.value
-                                 , "path_y_step":    disp_path_y_step.value
-                                 , "path_speed":     disp_path_speed.value
-                                 , "path_scan_mode": disp_path_scan_mode.value
-                                 , "path_adc_delay": disp_path_adc_delay.value
-                                 }
-                  , "report_action":"disp_params(in_msg)"
-                  };
+        const out_msg = { "cmd":"path_lib.init_params()"
+                        , "new_params":{ "path_title":     disp_path_title.value
+                                       , "path_width":     disp_path_width.value
+                                       , "path_length":    disp_path_length.value
+                                       , "path_x_step":    disp_path_x_step.value
+                                       , "path_y_step":    disp_path_y_step.value
+                                       , "path_speed":     disp_path_speed.value
+                                       , "path_scan_mode": disp_path_scan_mode.value
+                                       , "path_adc_delay": disp_path_adc_delay.value
+                                       }
+                        , "report_action":"disp_params(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function reread_usspi_params() {
-        out_msg = { "cmd":"usspi_lib.reread_params()"
-                  , "report_action":"disp_params(in_msg)"
-                  };
+        const out_msg = { "cmd":"usspi_lib.reread_params()"
+                        , "report_action":"disp_params(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function reread_path_params() {
-        out_msg = { "cmd":"path_lib.reread_params()"
-                  , "report_action":"disp_params(in_msg)"
-                  };
+        const out_msg = { "cmd":"path_lib.reread_params()"
+                        , "report_action":"disp_params(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function db_list() {
-        out_msg = { "cmd":"path_lib.db_list()"
-                  , "report_action":"disp_params(in_msg)"
-                  };
+        const out_msg = { "cmd":"path_lib.db_list()"
+                        , "report_action":"disp_params(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function db_reload(n) {
+  
         fwk_show_section(tab_disp);
-        out_msg = { "cmd":"path_lib.db_reload()"
-                  , "item":n
-                  , "report_action":"disp_xy(in_msg)"
-                  };
+        disp_clear_xy();
+        const out_msg = { "cmd":"path_lib.db_reload()"
+                        , "item":n
+                        , "report_action":"disp_xy(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function reset_path() {
-        out_msg = { "cmd":"path_lib.reset_path()"
-                  , "report_action":"disp_xy(in_msg)"};
+        const out_msg = { "cmd":"path_lib.reset_path()"
+                        , "report_action":"disp_xy(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function run_path() {
-        out_msg = { "cmd":"path_lib.run_path()"
-                  , "report_action":"disp_xy(in_msg)"};
+        const out_msg = { "cmd":"path_lib.run_path()"
+                        , "report_action":"disp_xy(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function pause_path() {
-        out_msg = { "cmd":"path_lib.pause_path()"
-                  , "report_action":"disp_xy(in_msg)"};
+        const out_msg = { "cmd":"path_lib.pause_path()"
+                        , "report_action":"disp_xy(in_msg)"
+                        };
         ws.send(JSON.stringify(out_msg));
       }
       
       //----------------------------------------
       function reread_path() {
-        out_msg = { "cmd":"path_lib.reread_path()"
-                  , "report_action":"disp_xy(in_msg)"};
+        disp_clear_xy();
+        const out_msg = { "cmd":"path_lib.reread_path()"
+                        , "report_action":"disp_xy(in_msg)"
+                        };
         if (!ws_error) {
           ws.send(JSON.stringify(out_msg));
         } else {
@@ -599,11 +479,13 @@
           };
           
         btn_db_reload_file.onclick = function(event) {
-        function load_local_data_cb(file_text) {
-           eval("local_data['data'] = " + file_text + ";");
-           fwk_show_section(tab_disp);
-           reread_path();
-        }
+          function load_local_data_cb(file_text) {
+            if(file_text > ""){
+              fwk_show_section(tab_disp);
+              eval("local_data['data'] = " + file_text + ";");
+              reread_path();
+            }
+          }
           fwk_read_file(disp_path_data_file.value, load_local_data_cb);
         };
         
@@ -646,15 +528,17 @@
           reread_path();
           };
         btn_delay_p.onclick = function(event) {
-          d = Math.min(500, (parseFloat(disp_delay_us.value) + parseFloat(disp_nb_samples.value)*1/current_sampling()/3).toFixed(0));
+          const d = Math.min(500, (parseFloat(disp_delay_us.value) + parseFloat(disp_nb_samples.value)*1/current_sampling()/3).toFixed(0));
           init_usspi_delay_param(d);
           read_raw(-1);
           };
         btn_delay_m.onclick = function(event) {
-          d = Math.max(0, (parseFloat(disp_delay_us.value) - parseFloat(disp_nb_samples.value)*1/current_sampling()/3).toFixed(0));
+          const d = Math.max(0, (parseFloat(disp_delay_us.value) - parseFloat(disp_nb_samples.value)*1/current_sampling()/3).toFixed(0));
           init_usspi_delay_param(d);
           read_raw(-1);
           };
+          
+        disp_clear_xy();
       }
       
     </script>
@@ -664,7 +548,7 @@
     <header>
       <img src="img/echopen_logo.png" alt="echopen_logo"/>
       <nav>
-        <button id="btn_cnx" type="button" title="Connexion"></button>
+        <button id="btn_cnx" type="button" title="Reset to std params"></button>
         <button id="btn_reset"   type="button" title="Reset path script"></button>
         <button id="btn_run" type="button" title="Run test path script"></button>
         <button id="btn_pause"  type="button" title="Pause test path script"></button>
@@ -683,7 +567,7 @@
         <table>
           <tr>
 <!--            <td rowspan="8" colspan="2"><canvas id="cnv_xy" width="1024" height="512" style="width:100%;"/></td>-->
-            <td rowspan="8" colspan="2"><div id="div_plotxy" xxxstyle="width:100%;height:100%;"/></td>
+            <td rowspan="8" colspan="2" style="background:white;border:solid 1px ;"><div id="div_plotxy"/></td>
             <td colspan="3">
               <input id="rdo_graph_db_c" type="radio" name="set_graph_mode" value="db" title="Attenuation contour" checked="true">dB</input>
               <input id="rdo_graph_a_c" type="radio" name="set_graph_mode" value="v" title="Amplitude contour" >A</input>
@@ -788,16 +672,16 @@
       <section id="sec_db">
         <h1>Measures database</h1>
         <table class="params">
-          <tr><th></th><td><button id="btn_db_reload_file"  type="button" title="Reload local fie"></button><td><input id="disp_path_data_file" type="text" title="local file" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>1</th><td><button id="btn_db_reload_1"  type="button" title="Reload memorized measures 1"></button><td><input id="disp_path_data_mem1" type="text" title="memorized measures 1" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>2</th><td><button id="btn_db_reload_2"  type="button" title="Reload memorized measures 2"></button><td><input id="disp_path_data_mem2" type="text" title="memorized measures 2" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>3</th><td><button id="btn_db_reload_3"  type="button" title="Reload memorized measures 3"></button><td><input id="disp_path_data_mem3" type="text" title="memorized measures 3" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>4</th><td><button id="btn_db_reload_4"  type="button" title="Reload memorized measures 4"></button><td><input id="disp_path_data_mem4" type="text" title="memorized measures 4" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>5</th><td><button id="btn_db_reload_5"  type="button" title="Reload memorized measures 5"></button><td><input id="disp_path_data_mem5" type="text" title="memorized measures 5" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>6</th><td><button id="btn_db_reload_6"  type="button" title="Reload memorized measures 6"></button><td><input id="disp_path_data_mem6" type="text" title="memorized measures 6" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>7</th><td><button id="btn_db_reload_7"  type="button" title="Reload memorized measures 7"></button><td><input id="disp_path_data_mem7" type="text" title="memorized measures 7" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>8</th><td><button id="btn_db_reload_8"  type="button" title="Reload memorized measures 8"></button><td><input id="disp_path_data_mem8" type="text" title="memorized measures 8" style="width:100%;text-align:left;"></input></td></tr>
-          <tr><th>9</th><td><button id="btn_db_reload_9"  type="button" title="Reload memorized measures 9"></button><td><input id="disp_path_data_mem9" type="text" title="memorized measures 9" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th></th><td><button id="btn_db_reload_file"  type="button" title="Reload browser side stored file"></button><td><input id="disp_path_data_file" type="text" title="local file ex : relative/path/to/filename.json" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>1</th><td><button id="btn_db_reload_1"  type="button" title="Reload server side memorized measures 1"></button><td><input id="disp_path_data_mem1" type="text" title="measures 1" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>2</th><td><button id="btn_db_reload_2"  type="button" title="Reload server side memorized measures 2"></button><td><input id="disp_path_data_mem2" type="text" title="measures 2" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>3</th><td><button id="btn_db_reload_3"  type="button" title="Reload server side memorized measures 3"></button><td><input id="disp_path_data_mem3" type="text" title="measures 3" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>4</th><td><button id="btn_db_reload_4"  type="button" title="Reload server side memorized measures 4"></button><td><input id="disp_path_data_mem4" type="text" title="measures 4" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>5</th><td><button id="btn_db_reload_5"  type="button" title="Reload server side memorized measures 5"></button><td><input id="disp_path_data_mem5" type="text" title="measures 5" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>6</th><td><button id="btn_db_reload_6"  type="button" title="Reload server side memorized measures 6"></button><td><input id="disp_path_data_mem6" type="text" title="measures 6" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>7</th><td><button id="btn_db_reload_7"  type="button" title="Reload server side memorized measures 7"></button><td><input id="disp_path_data_mem7" type="text" title="measures 7" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>8</th><td><button id="btn_db_reload_8"  type="button" title="Reload server side memorized measures 8"></button><td><input id="disp_path_data_mem8" type="text" title="measures 8" style="width:100%;text-align:left;"></input></td></tr>
+          <tr><th>9</th><td><button id="btn_db_reload_9"  type="button" title="Reload server side memorized measures 9"></button><td><input id="disp_path_data_mem9" type="text" title="measures 9" style="width:100%;text-align:left;"></input></td></tr>
         </table>
       </section>
 

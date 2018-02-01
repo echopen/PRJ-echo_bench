@@ -193,3 +193,39 @@ section canvas, section xxxdiv {
 .params th+td {
   color: hsl(216,45%,49%);
 }
+
+#tab_scan                {background-image: url(img/tab_scan.svg);}
+#btn_x_m                 {background-image: url(img/btn_x_m.svg);}
+#btn_reset               {background-image: url(img/btn_reset.svg);}
+#btn_reread_usspi_params {background-image: url(img/btn_reread_usspi_params.svg);}
+#btn_pulse_cont          {background-image: url(img/btn_pulse_cont.svg);}
+#tab_path_params         {background-image: url(img/tab_path_params.svg);}
+#btn_pom                 {background-image: url(img/btn_pom.svg);}
+#tab_db                  {background-image: url(img/tab_db.svg);}
+#btn_x_p                 {background-image: url(img/btn_x_p.svg);}
+#btn_y_m                 {background-image: url(img/btn_y_m.svg);}
+#tab_usspi_params        {background-image: url(img/tab_usspi_params.svg);}
+#btn_reread_path_params  {background-image: url(img/btn_reread_path_params.svg);}
+#btn_run                 {background-image: url(img/btn_run.svg);}
+#tab_acq                 {background-image: url(img/tab_acq.svg);}
+#btn_pause               {background-image: url(img/btn_pause.svg);}
+#btn_run                 {background-image: url(img/btn_run.svg);}
+#btn_y_p                 {background-image: url(img/btn_y_p.svg);}
+#btn_apply_usspi_params  {background-image: url(img/btn_apply_usspi_params.svg);}
+#btn_send_g              {background-image: url(img/btn_send_g.svg);}
+#btn_set_org             {background-image: url(img/btn_set_org.svg);}
+#tab_home                {background-image: url(img/tab_home.svg);}
+#btn_apply_path_params   {background-image: url(img/btn_apply_path_params.svg);}
+#btn_cnx                 {background-image: url(img/btn_cnx.svg);}
+#btn_delay_m             {background-image: url(img/btn_delay_m.svg);}
+#tab_emit                {background-image: url(img/tab_emit.svg);}
+#btn_delay_p             {background-image: url(img/btn_delay_p.svg);}
+#btn_pulse_one           {background-image: url(img/btn_pulse_one.svg);}
+#btn_xy_0                {background-image: url(img/btn_xy_0.svg);}
+#xxxbtn_xy_0             {background-image: url(img/xxxbtn_xy_0.svg);}
+#tab_disp                {background-image: url(img/tab_disp.svg);}
+#btn_pulse_stop          {background-image: url(img/btn_pulse_stop.svg);}
+#btn_db_reload_file      {background-image: url(img/btn_file_reload.svg);}
+#btn_db_reload_1,#btn_db_reload_2,#btn_db_reload_3,#btn_db_reload_4,
+#btn_db_reload_5,#btn_db_reload_6,#btn_db_reload_7,#btn_db_reload_8,
+#btn_db_reload_9         {background-image: url(img/btn_db_reload.svg);}
