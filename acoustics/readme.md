@@ -14,7 +14,6 @@
 * Critical angle of longitudinal transmission from water to copper : 19.4°.
 * Critical angle of shear transmission from water to copper : 39.7°
 * The incident angle (45°) is greater than the critical angles of longitudinal and shear transmission, therefore, there is no transmission of the incident wave into the copper layer, therefore neither longitudinal nor shear echo ([total internal reflection](https://en.wikipedia.org/wiki/Total_internal_reflection)).
-* There is a direct shear reflection of 20.7°
 
 *(To reproduce the results, execute in Octave the script “acousticsOfMirrors.m”)*
 
@@ -101,3 +100,7 @@ Acoustic impedence (in Ns/m³):
 [12] http://www.ondacorp.com/images/Liquids.pdf
 [13] http://hyperphysics.phy-astr.gsu.edu/hbase/Tables/Soundv.html
 [14] http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.457.3039&rep=rep1&type=pdf
+
+## Furher messy notes
+https://www.nde-ed.org/EducationResources/CommunityCollege/Ultrasonics/Physics/modeconversion.htm
+https://acoustics.byu.edu/content/mode-conversion

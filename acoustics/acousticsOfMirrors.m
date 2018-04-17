@@ -7,9 +7,9 @@ function acousticsOfMirrors
 
 	% Speed of shear wave propagation in the considered media.
 	% we take the mean value of all source we found
-	vsWater = vlWater / 2;
+	vsWater = vlWater;
 	vsCopper = mean([2330,2325,2325]);
-	vsPCB = vlPCB / 2;
+	vsPCB = vlPCB / 2; % hypothese
 
 	% critical angles:
 	disp (strcat("critical angle of longitudinal transmission Water->Copper : ", num2str(rad2deg(criticalAngleOfTransmission(vlWater, vlCopper)))));
