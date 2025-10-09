@@ -1,0 +1,195 @@
+= Board requirements 
+:doctype: book
+:revnumber: 1.0
+:revdate: 2025-10-07
+:author: System Engineering Team
+:toc: left
+:sectnums:
+
+[[SPEC_BOARD-REQ-01234]]
+=== SPEC_BOARD-REQ-01234 (1.2): FPGA clock synchronization
+
+:status: VALIDATED
+:type: Linked
+:allocation: HW, FPGA
+:source: SPEC_SYSTEM-REQ-00010, SPEC_SYSTEM-REQ-00036
+
+[width="80%",cols="1,2",options="header"]
+|===
+| Attribute | Value
+
+| Status
+| {status}
+
+| Type
+| {type}
+
+| Allocation
+| {allocation}
+
+| Source
+| {source}
+|===
+==== Description
+The FPGA shall synchronize its internal clock with the main board oscillator within 2 µs after reset.
+
+==== Coverage
+COVER: 
+- xref:SPEC_SYSTEM-REQ-00010 (A)[]
+- xref:SPEC_SYSTEM-REQ-00036 (B)[]
+
+==== Traceability
+*Derived from:* None  
+*Verified by:* TEST_BOARD-0054  
+*Justification:* Design analysis and validation test results.
+
+==== End of requirement
+ENDREQ
+
+[[SPEC_BOARD-REQ-04567]]
+=== SPEC_BOARD-REQ-04567 (1.3): Clock phase compensation
+
+*Type:* Derived  
+*Allocation:* HW  
+*Status:* UNDER VALIDATION  
+*Source:* Derived from system analysis
+
+==== Description
+The system shall compensate the input clock phase to maintain synchronization under variable temperature conditions.
+
+==== Tag
+DERIVED
+ENDREQ
+
+[[SPEC_BOARD-REQ-00999]]
+=== SPEC_BOARD-REQ-00999 (1.1): Legacy timing control
+
+*Type:* Deleted  
+*Status:* OBSOLETE
+
+==== Description
+This requirement has been removed as of revision 1.1. Functionality replaced by SPEC_BOARD-REQ-01234.
+
+==== Tag
+DELETED
+ENDREQ
+
+---
+
+= Board Validation Test Plan
+:doctype: book
+:revnumber: 1.0
+:revdate: 2025-10-07
+:author: Validation Team
+:toc: left
+:sectnums:
+
+[[BVTP-BOARD]]
+== BVTP-BOARD – Board Validation Test Plan
+
+=== 1. Introduction
+
+This document defines the test strategy, configuration, and procedures
+used to verify compliance of the board with its design and functional requirements.
+
+=== 2. References
+
+* xref:SPEC_BOARD-REQ-01234[] 
+* xref:SPEC_BOARD-REQ-04567[]
+
+=== 3. Test Environment
+
+* Test bench: TB-BOARD-01  
+* Equipment: Oscilloscope Tektronix MSO54, temperature chamber  
+* Software: FPGA image v2.1.3, test automation scripts v1.0  
+* Power supply: 12 V DC ±5%
+
+=== 4. Test Objectives
+
+|===
+| Objective ID | Description | Related Requirement(s)
+
+| OBJ-001 | Verify FPGA synchronization with main oscillator | xref:SPEC_BOARD-REQ-01234[]
+| OBJ-002 | Validate clock phase compensation over temperature | xref:SPEC_BOARD-REQ-04567[]
+|===
+
+=== 5. Test Cases
+
+[[TEST-001]]
+==== TEST-001 – FPGA Clock Synchronization
+
+*Objective:* OBJ-001  
+*Requirement(s):* xref:SPEC_BOARD-REQ-01234[]  
+*Type:* Functional test  
+*Status:* Draft  
+
+===== Description
+Verify that the FPGA synchronizes with the main oscillator within 2 µs after reset.
+
+===== Test Procedure
+. Power up the board.
+. Trigger FPGA reset.
+. Measure time delta between main oscillator rising edge and FPGA internal clock.
+. Repeat over 10 cycles.
+. Record results.
+
+===== Expected Results
+The synchronization delay shall be ≤ 2 µs for all measurements.
+
+===== Acceptance Criteria
+Pass if:
+* Average synchronization ≤ 2 µs  
+* No individual test exceeds 2.2 µs  
+
+===== Traceability
+*Covers requirement:* xref:SPEC_BOARD-REQ-01234[]  
+*Validated by:* TEST_REPORT-001
+
+ENDTEST
+
+[[TEST-002]]
+==== TEST-002 – Clock Phase Compensation
+
+*Objective:* OBJ-002  
+*Requirement(s):* xref:SPEC_BOARD-REQ-04567[]  
+*Type:* Performance test  
+*Status:* Draft  
+
+===== Description
+Validate that the FPGA compensates clock phase variations under thermal stress.
+
+===== Test Procedure
+. Configure board in thermal chamber.
+. Sweep temperature from -40°C to +85°C.
+. Log clock phase difference every 10°C.
+. Compare phase with reference signal.
+
+===== Expected Results
+Clock phase drift shall remain within ±10 ns of reference.
+
+===== Acceptance Criteria
+Pass if:
+* Maximum drift ≤ ±10 ns over the temperature range.  
+* Phase correction loop remains stable.
+
+===== Traceability
+*Derived from requirement:* xref:SPEC_BOARD-REQ-04567[]  
+*Validated by:* TEST_REPORT-002
+
+ENDTEST
+
+=== 6. Summary of Test Coverage
+
+|===
+| Test ID | Requirement(s) | Objective | Status
+
+| TEST-001 | SPEC_BOARD-REQ-01234 | OBJ-001 | Draft
+| TEST-002 | SPEC_BOARD-REQ-04567 | OBJ-002 | Draft
+|===
+
+=== 7. Conclusion
+
+All test cases defined in this plan ensure coverage of key board-level requirements.
+Further tests will be added for new FPGA versions and additional derived requirements.
+
+ENDDOC
